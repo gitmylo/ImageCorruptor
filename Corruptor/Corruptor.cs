@@ -36,8 +36,15 @@ namespace Corruptor
 
             if (config.shuffle)
             {
+                int shuffleSize = config.shuffleSize;
+                if (shuffleSize == 0)
+                {
+                    int randomShuffleSize = random.Next(1, 16);
+                    shuffleSize = randomShuffleSize;
+                }
+                Console.WriteLine("Shuffle size: " + shuffleSize);
                 //shuffle the bytes in jumps of config.shuffleSize
-                for (var i = 0; i < bytes.Length; i += config.shuffleSize)
+                for (var i = 0; i < bytes.Length; i += shuffleSize)
                 {
                     var j = random.Next(0, bytes.Length);
                     var temp = bytes[i];
@@ -48,18 +55,46 @@ namespace Corruptor
 
             if (config.chunkShuffle)
             {
+                int shuffleSize = config.chunkShuffleSize;
+                if (shuffleSize == 0)
+                {
+                    int randomChunkSize = random.Next(1, bytes.Length);
+                    shuffleSize = randomChunkSize;
+                }
+                Console.WriteLine("chunk size: " + shuffleSize);
                 //shuffle the bytes in combined of config.chunkShuffleSize. This is done by swapping 2 arrays of bytes
-                byte[] originalChunk = new byte[config.chunkShuffleSize];
-                byte[] shuffledChunk = new byte[config.chunkShuffleSize];
-                for (var i = 0; i < bytes.Length - config.chunkShuffleSize; i += config.chunkShuffleSize)
+                byte[] originalChunk = new byte[shuffleSize];
+                byte[] shuffledChunk = new byte[shuffleSize];
+                for (var i = 0; i < bytes.Length - shuffleSize*2; i += shuffleSize)
                 {
                     //copy the original chunk to the originalChunk array
-                    Array.Copy(bytes, i, originalChunk, 0, config.chunkShuffleSize);
+                    Array.Copy(bytes, i, originalChunk, 0, shuffleSize);
                     //copy the shuffled chunk to the shuffledChunk array
-                    Array.Copy(bytes, i + config.chunkShuffleSize, shuffledChunk, 0, config.chunkShuffleSize);
+                    Array.Copy(bytes, i + shuffleSize, shuffledChunk, 0, shuffleSize);
                     //swap the original and shuffled chunks
-                    Array.Copy(shuffledChunk, 0, bytes, i, config.chunkShuffleSize);
-                    Array.Copy(originalChunk, 0, bytes, i + config.chunkShuffleSize, config.chunkShuffleSize);
+                    Array.Copy(shuffledChunk, 0, bytes, i, shuffleSize);
+                    Array.Copy(originalChunk, 0, bytes, i + shuffleSize, shuffleSize);
+                }
+            }
+
+            if (config.artifactAdd)
+            {
+                int artifactSize = config.artifactSize;
+                if (artifactSize == 0)
+                {
+                    artifactSize = 4 * random.Next(1, bytes.Length);
+                }
+                Console.WriteLine("Artifact size: " + artifactSize);
+                //replace an array of bytes from the original image with a random array of bytes, multiple times, using Array.Copy()
+                for (int v = 0; v < random.Next(config.maxArtifacts); v++)
+                {
+                    int start = random.Next(bytes.Length - artifactSize);
+                    byte[] artifact = new byte[artifactSize];
+                    for (int i = 0; i < artifactSize; i++)
+                    {
+                        artifact[i] = (byte)random.Next(0, 256);
+                    }
+                    Array.Copy(artifact, 0, bytes, start, artifactSize);
                 }
             }
             Marshal.Copy(bytes, 0, data.Scan0, bytes.Length);
