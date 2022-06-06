@@ -8,7 +8,7 @@ namespace Corruptor
   {
     public static void Main(string[] args)
     {
-      File.WriteAllText("exampleconfig.conf", JsonConvert.SerializeObject(new Config()));
+      File.WriteAllText("exampleconfig.conf", JsonConvert.SerializeObject(new Config(), Formatting.Indented));
       if (args.Length != 3)
       {
         Console.WriteLine("Usage: Corruptor.exe <config> <file> <output> or Corruptor.exe <config> <directory> <output>");
