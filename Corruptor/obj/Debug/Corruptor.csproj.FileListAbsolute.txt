@@ -1,0 +1,9 @@
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\obj\Debug\Corruptor.csproj.AssemblyReference.cache
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\obj\Debug\Corruptor.csproj.CoreCompileInputs.cache
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\bin\Debug\Corruptor.exe
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\bin\Debug\Corruptor.pdb
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\bin\Debug\Newtonsoft.Json.dll
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\bin\Debug\Newtonsoft.Json.xml
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\obj\Debug\Corruptor.csproj.CopyComplete
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\obj\Debug\Corruptor.exe
+C:\Users\milan\RiderProjects\Corruptor\Corruptor\obj\Debug\Corruptor.pdb
