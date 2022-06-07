@@ -66,7 +66,7 @@ namespace Corruptor
             GifWriter gifWriter = new GifWriter(saveFileDialog2.FileName, Repeat:0);
             Random r = new Random();
             Corruptor corruptor = new Corruptor(config);
-            int count = r.Next(10, 30);
+            int count = r.Next(20, 100);
             for (int i = 0; i < count; i++)
             {
                 gifWriter.WriteFrame(corruptor.CorruptImage(bmp), r.Next(10, 50));
