@@ -79,7 +79,7 @@ namespace Corruptor
                 int artifactSize = config.artifactSize;
                 if (artifactSize == 0)
                 {
-                    artifactSize = 4 * random.Next(1, bytes.Length);
+                    artifactSize = 4 * random.Next(1, bytes.Length/4);
                 }
                 Console.WriteLine("Artifact size: " + artifactSize);
                 //replace an array of bytes from the original image with a random array of bytes, multiple times, using Array.Copy()

@@ -43,7 +43,7 @@ namespace Corruptor
         {
             try
             {
-                bmp.Save(saveFileDialog1.FileName);
+                pictureBox1.Image.Save(saveFileDialog1.FileName);
             }
             catch (Exception exception)
             {
