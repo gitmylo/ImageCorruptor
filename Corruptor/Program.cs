@@ -1,14 +1,21 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using Newtonsoft.Json;
 
 namespace Corruptor
 {
   internal class Program
   {
+    [STAThread]
     public static void Main(string[] args)
     {
       File.WriteAllText("exampleconfig.conf", JsonConvert.SerializeObject(new Config(), Formatting.Indented));
+      if (args.Length == 1 && args[0] == "gui")
+      {
+        new Gui().ShowDialog();
+        return;
+      }
       if (args.Length != 3)
       {
         Console.WriteLine("Usage: Corruptor.exe <config> <file> <output> or Corruptor.exe <config> <directory> <output>");

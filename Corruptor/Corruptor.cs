@@ -14,13 +14,30 @@ namespace Corruptor
         {
             this.config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config));
         }
+        
+        public Corruptor(Config config)
+        {
+            this.config = config;
+        }
 
         public void Corrupt(string file, string outputFile)
         {
             //announce start
             Console.WriteLine("Corrupting " + file);
             //corrupt bitmap image by getting the data without headers and randomising some bits
-            var bitmap = new Bitmap(file);
+            Bitmap bitmap = CorruptImage(new Bitmap(file));
+            //announce save
+            Console.WriteLine("Saving " + outputFile);
+            Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
+            bitmap.Save(outputFile, bitmap.RawFormat);
+        }
+
+        public Bitmap CorruptImage(Bitmap original)
+        {
+            //announce start
+            Console.WriteLine("Corrupting from Gui");
+            Bitmap bitmap = (Bitmap) original.Clone();
+            //corrupt bitmap image by getting the data without headers and randomising some bits
             var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
             var bytes = new byte[data.Stride * data.Height];
             Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
@@ -44,39 +61,19 @@ namespace Corruptor
                 }
                 Console.WriteLine("Shuffle size: " + shuffleSize);
                 //shuffle the bytes in jumps of config.shuffleSize
-                for (var i = 0; i < bytes.Length; i += shuffleSize)
+                for (var i = 0; i < bytes.Length; i += Math.Min(1, random.Next(shuffleSize - 5, shuffleSize + 5)))
                 {
+                    if (i > bytes.Length - (shuffleSize + 5))
+                    {
+                        break;
+                    }
                     var j = random.Next(0, bytes.Length);
                     var temp = bytes[i];
                     bytes[i] = bytes[j];
                     bytes[j] = temp;
                 }
             }
-
-            if (config.chunkShuffle)
-            {
-                int shuffleSize = config.chunkShuffleSize;
-                if (shuffleSize == 0)
-                {
-                    int randomChunkSize = random.Next(1, bytes.Length);
-                    shuffleSize = randomChunkSize;
-                }
-                Console.WriteLine("chunk size: " + shuffleSize);
-                //shuffle the bytes in combined of config.chunkShuffleSize. This is done by swapping 2 arrays of bytes
-                byte[] originalChunk = new byte[shuffleSize];
-                byte[] shuffledChunk = new byte[shuffleSize];
-                for (var i = 0; i < bytes.Length - shuffleSize*2; i += shuffleSize)
-                {
-                    //copy the original chunk to the originalChunk array
-                    Array.Copy(bytes, i, originalChunk, 0, shuffleSize);
-                    //copy the shuffled chunk to the shuffledChunk array
-                    Array.Copy(bytes, i + shuffleSize, shuffledChunk, 0, shuffleSize);
-                    //swap the original and shuffled chunks
-                    Array.Copy(shuffledChunk, 0, bytes, i, shuffleSize);
-                    Array.Copy(originalChunk, 0, bytes, i + shuffleSize, shuffleSize);
-                }
-            }
-
+            
             if (config.artifactAdd)
             {
                 int artifactSize = config.artifactSize;
@@ -97,12 +94,35 @@ namespace Corruptor
                     Array.Copy(artifact, 0, bytes, start, artifactSize);
                 }
             }
+
+            if (config.chunkShuffle)
+            {
+                int shuffleSize = config.chunkShuffleSize;
+                if (shuffleSize == 0)
+                {
+                    int randomChunkSize = random.Next(1, bytes.Length);
+                    shuffleSize = randomChunkSize;
+                }
+
+                Console.WriteLine("chunk size: " + shuffleSize);
+                //shuffle the bytes in combined of config.chunkShuffleSize. This is done by swapping 2 arrays of bytes
+                byte[] originalChunk = new byte[shuffleSize];
+                byte[] shuffledChunk = new byte[shuffleSize];
+                for (var i = 0; i < bytes.Length - shuffleSize * 2; i += shuffleSize)
+                {
+                    //copy the original chunk to the originalChunk array
+                    Array.Copy(bytes, i, originalChunk, 0, shuffleSize);
+                    //copy the shuffled chunk to the shuffledChunk array
+                    Array.Copy(bytes, i + shuffleSize, shuffledChunk, 0, shuffleSize);
+                    //swap the original and shuffled chunks
+                    Array.Copy(shuffledChunk, 0, bytes, i, shuffleSize);
+                    Array.Copy(originalChunk, 0, bytes, i + shuffleSize, shuffleSize);
+                }
+            }
+
             Marshal.Copy(bytes, 0, data.Scan0, bytes.Length);
             bitmap.UnlockBits(data);
-            //announce save
-            Console.WriteLine("Saving " + outputFile);
-            Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
-            bitmap.Save(outputFile, bitmap.RawFormat);
+            return bitmap;
         }
         
         public void CorruptDirectory(string directory, string outputFile)
