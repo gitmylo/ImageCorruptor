@@ -192,7 +192,7 @@ public class GifWriter : IDisposable
     public void Dispose()
     {
         // Complete File
-        //_writer.Write((byte)0x3b); // File Trailer
+        _writer.Write((byte)0x3b); // File Trailer
 
         _writer.BaseStream.Dispose();
         _writer.Dispose();

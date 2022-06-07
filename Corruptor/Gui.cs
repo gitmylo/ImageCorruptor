@@ -73,5 +73,24 @@ namespace Corruptor
             }
             gifWriter.Dispose();
         }
+
+        private void saveGifIncrementalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveFileDialog3.ShowDialog();
+        }
+
+        private void saveFileDialog3_FileOk(object sender, CancelEventArgs e)
+        {
+            Bitmap lastImage = bmp;
+            GifWriter gifWriter = new GifWriter(saveFileDialog3.FileName, Repeat:0);
+            Random r = new Random();
+            Corruptor corruptor = new Corruptor(config);
+            int count = r.Next(20, 100);
+            for (int i = 0; i < count; i++)
+            {
+                gifWriter.WriteFrame(lastImage = corruptor.CorruptImage(lastImage), r.Next(10, 50));
+            }
+            gifWriter.Dispose();
+        }
     }
 }
