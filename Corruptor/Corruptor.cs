@@ -68,9 +68,7 @@ namespace Corruptor
                         break;
                     }
                     var j = random.Next(0, bytes.Length);
-                    var temp = bytes[i];
-                    bytes[i] = bytes[j];
-                    bytes[j] = temp;
+                    (bytes[i], bytes[j]) = (bytes[j], bytes[i]);
                 }
             }
             
